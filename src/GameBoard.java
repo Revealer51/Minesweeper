@@ -15,6 +15,15 @@ public class GameBoard extends javax.swing.JPanel implements Runnable {
 	private int bombCount;
 	private int z;
 
+	public void makeGameBoard() {
+		GameBoard a = new GameBoard(z);
+		board = a.board;
+		bombCount = a.bombCount;
+		Runnable r = (Runnable) this;
+		new Thread(r).start();
+
+	}
+
 	public GameBoard(int z) {
 		this.z = z;
 		int row, column, bombCount;
@@ -129,7 +138,7 @@ public class GameBoard extends javax.swing.JPanel implements Runnable {
 
 	@Override
 	public void run() {
-		int a = 0;
+		int tryAgain = 0;
 		initiation();
 		// TODO Auto-generated method stub
 
@@ -163,17 +172,30 @@ public class GameBoard extends javax.swing.JPanel implements Runnable {
 							} else {
 								find(board, r, c);
 								if (checkGame(board)) {
-									int b = JOptionPane.showOptionDialog(null, "You win! Try again?",
+									tryAgain = JOptionPane.showOptionDialog(null, "You win! Try again?",
 											"Minesweeper Message", JOptionPane.YES_NO_OPTION,
 											JOptionPane.QUESTION_MESSAGE, null, null, null);
+									if (tryAgain == 0) {
+										synchronized (this) {
+											notify();
+										}
+										return;
+									}
 								}
 							}
 						}
 					}
 				}
 			} catch (InterruptedException e) {
-				a = JOptionPane.showOptionDialog(null, "You blew up! Try again?", "Minesweeper Message",
+				tryAgain = JOptionPane.showOptionDialog(null, "You blew up! Try again?", "Minesweeper Message",
 						JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
+				if (tryAgain == 0) {
+					synchronized (this) {
+						notify();
+					}
+					return;
+
+				}
 			}
 
 		}
