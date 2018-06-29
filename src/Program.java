@@ -25,7 +25,18 @@ public class Program {
 			}
 		});
 		Runnable r = (Runnable)panel;
-		new Thread(r).start();
+		Thread t = new Thread(r);
+		synchronized (t) {
+			try {
+				t.start();
+				t.wait();
+				frame.setVisible(false);
+				Program.main(null);
+			} catch (InterruptedException e) {
+
+			}
+		}
+		}
 	}
 
 	public static int myShowMessage(String message) {
